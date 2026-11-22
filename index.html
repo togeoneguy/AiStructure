@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" /><meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://avatars.githubusercontent.com; connect-src 'self' https://openrouter.ai https://router.huggingface.co; worker-src 'self' blob:">
+  <title>AiStructure</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div id="captcha" class="gate">
+    <form id="captcha-form" class="gate-card">
+      <div class="logo"><span class="logo-mark">A</span><b>AiStructure</b></div>
+      <h1>Проверка безопасности</h1><p>Подтвердите, что вы человек.</p>
+      <label class="challenge"><input id="captcha-check" type="checkbox" /><span>Я не робот</span><b>AI</b></label>
+      <button class="primary" type="submit">Войти</button>
+    </form>
+  </div>
+
+  <main id="app" hidden>
+    <header><div class="logo"><span class="logo-mark">A</span><b>AiStructure</b></div><div class="status"><i></i> Система готова</div></header>
+    <aside class="models">
+      <h3>ИИ-модели</h3><p class="muted">Free API models</p>
+      <button class="model active" data-model="openrouter/free"><b>OpenRouter Free</b><small>Универсальная</small><em>Free</em></button>
+      <button class="model" data-model="deepseek/deepseek-r1:free"><b>DeepSeek R1</b><small>Рассуждения</small><em>Free</em></button>
+      <button class="model" data-model="google/gemma-3-27b-it:free"><b>Gemma 3 27B</b><small>Сцены и код</small><em>Free</em></button>
+    </aside>
+    <section class="viewport">
+      <div class="toolbar"><span>Сцена 01</span><button id="reset-view">Сбросить</button></div>
+      <canvas id="scene"></canvas>
+      <div id="empty" class="empty"><b>Опишите объект</b><span>ИИ создаст 3D-сцену здесь</span></div>
+    </section>
+    <aside class="chat">
+      <div class="chat-head"><b>Строитель ИИ</b><span id="model-name">openrouter/free</span></div>
+      <div id="messages" class="messages"><div class="assistant">Привет! Опиши объект, например: «современный низкополигональный дом у озера».</div></div>
+      <div id="live" class="live"><b>Живой процесс</b><div id="steps"></div></div>
+      <form id="prompt-form" class="prompt"><textarea id="prompt" placeholder="Опишите сцену…" required></textarea><button class="send" type="submit">↗</button></form>
+    </aside>
+  </main>
+  <script type="module" src="app.js"></script>
+</body>
+</html>
