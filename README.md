@@ -1,30 +1,34 @@
 # AiStructure
 
-AI-assisted 3D scene builder. AiStructure is a browser interface for designing scenes with an AI model and inspecting/exporting geometry in Three.js.
+Браузерная студия для создания простых редактируемых 3D-сцен по текстовому описанию. Интерфейс использует Three.js, а чат — бесплатные модели из каталога OpenRouter.
 
-## Run
+## Запуск локально
 
-Static demo:
+Требуется Node.js 20 или новее.
 
 ```bash
-python3 -m http.server 8080
+npm install
+cp .env.example .env
 ```
 
-Open `http://localhost:8080`.
+Добавьте действительный ключ OpenRouter в `.env` (`OPENROUTER_API_KEY=...`), затем запустите:
 
-## Free API
+```bash
+npm start
+```
 
-Configure a backend rather than exposing API secrets in the browser:
+Откройте http://localhost:3000. Статический хостинг (в том числе GitHub Pages) не запускает Node backend, поэтому чат там не работает. Бесплатные модели всё равно требуют API-ключа провайдера; доступность и квоты могут меняться.
 
-- OpenRouter free models: `https://openrouter.ai/api/v1/chat/completions`
-- Hugging Face Router: `https://router.huggingface.co/v1/chat/completions`
+## Модели
 
-Set secrets in server environment variables. Do not commit `.env` files.
+Список загружается с OpenRouter и фильтруется по нулевой цене входных/выходных токенов. Сервер повторно проверяет выбор модели, держит ключ только в переменной окружения и проксирует запрос. Для моделей в каталоге цена и лимиты могут измениться в любой момент.
 
-## Security
+## Сцена
 
-- Never place provider API keys in frontend code
-- Use server-side origin validation and rate limiting
-- Keep CSP enabled
-- Validate and cap prompts before forwarding
-- Use authentication for production deployments
+- Вращение: перетаскивание мышью; масштабирование: колесо; панорамирование: правая кнопка мыши.
+- «Вид» кадрирует текущую сцену, «Сброс» очищает её.
+- «Экспорт GLB» скачивает сцену в бинарном формате glTF.
+
+## Защитные меры
+
+Ограничение размера JSON и длины запроса, rate limit на API, список разрешённых бесплатных моделей, серверное хранение ключа, ограничения геометрии/координат, Helmet и запрет отдачи dotfiles. Перед публичным развёртыванием настройте HTTPS, переменные окружения и ограничения провайдера.

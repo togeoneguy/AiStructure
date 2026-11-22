@@ -1,31 +1,47 @@
 <!doctype html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8" /><meta name="viewport" content="width=device-width,initial-scale=1" />
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://avatars.githubusercontent.com; connect-src 'self' https://openrouter.ai https://router.huggingface.co; worker-src 'self' blob:">
-  <title>AiStructure</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self'; worker-src 'self' blob:">
+  <meta name="theme-color" content="#0b0d10" />
+  <title>AiStructure — 3D Studio</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-  <main id="app">
-    <header><div class="logo"><span class="logo-mark">A</span><b>AiStructure</b></div><div class="status"><i></i> Система готова</div></header>
-    <aside class="models">
-      <h3>ИИ-модели</h3><p class="muted">Free API models</p>
-      <button class="model active" data-model="openrouter/free"><b>OpenRouter Free</b><small>Универсальная</small><em>Free</em></button>
-      <button class="model" data-model="deepseek/deepseek-r1:free"><b>DeepSeek R1</b><small>Рассуждения</small><em>Free</em></button>
-      <button class="model" data-model="google/gemma-3-27b-it:free"><b>Gemma 3 27B</b><small>Сцены и код</small><em>Free</em></button>
-    </aside>
-    <section class="viewport">
-      <div class="toolbar"><span>Сцена 01</span><button id="reset-view">Сбросить</button></div>
-      <canvas id="scene"></canvas>
-      <div id="empty" class="empty"><b>Опишите объект</b><span>ИИ создаст 3D-сцену здесь</span></div>
+  <main class="app-shell">
+    <header class="topbar">
+      <a class="brand" href="/" aria-label="AiStructure главная"><span class="brand-mark">A</span><span>AiStructure</span></a>
+      <div class="topbar-center"><span class="status-dot"></span><span id="status-text">Студия готова</span></div>
+      <a class="help-link" href="https://github.com/togeoneguy/AiStructure" target="_blank" rel="noreferrer">Справка</a>
+    </header>
+
+    <section class="workspace">
+      <section class="viewport-panel" aria-label="3D-сцена">
+        <div class="scene-toolbar">
+          <div class="scene-title"><span class="scene-icon">▧</span><span id="scene-title">Новая сцена</span><span class="saved-tag">Локально</span></div>
+          <div class="scene-actions">
+            <button id="view-home" class="tool-button" title="Вид на сцену">⌂ <span>Вид</span></button>
+            <button id="reset-scene" class="tool-button" title="Очистить сцену">↺ <span>Сброс</span></button>
+            <button id="export-scene" class="tool-button primary-tool" title="Скачать сцену в GLB">⇩ <span>Экспорт GLB</span></button>
+          </div>
+        </div>
+        <canvas id="scene" aria-label="Интерактивная 3D-сцена"></canvas>
+        <div id="empty" class="empty-state"><div class="empty-orb">✳</div><h2>Ваша сцена появится здесь</h2><p>Опишите идею в чате — ИИ превратит её в редактируемую 3D-сцену.</p></div>
+        <div class="viewport-hint">ЛКМ — вращение <span>·</span> Колесо — масштаб <span>·</span> ПКМ — перемещение</div>
+      </section>
+
+      <aside class="assistant-panel" aria-label="Чат с ИИ">
+        <div class="panel-heading"><div><div class="eyebrow">AI WORKSPACE</div><h1>3D-ассистент</h1></div><span class="online-pill"><i></i> онлайн</span></div>
+        <label class="model-label" for="model-select">Модель</label>
+        <div class="model-select-wrap"><select id="model-select" aria-label="Выбрать ИИ-модель"><option value="">Загружаю бесплатные модели…</option></select><span class="select-chevron">⌄</span></div>
+        <div id="model-note" class="model-note">Бесплатные модели OpenRouter. Доступность и лимиты задаёт провайдер.</div>
+        <div id="messages" class="messages" aria-live="polite"><div class="message assistant-message"><span class="message-avatar">A</span><div class="message-content">Привет! Опиши сцену — например: «уютная кофейня в японском стиле, деревянная стойка, столики и растения».</div></div></div>
+        <section class="activity"><div class="activity-heading"><span class="activity-pulse"></span><b>Ход генерации</b><span id="activity-state">Ожидаю задачу</span></div><div id="steps" class="activity-steps">Опиши объект, чтобы начать.</div></section>
+        <form id="prompt-form" class="composer"><textarea id="prompt" rows="3" maxlength="4000" placeholder="Опишите 3D-сцену…" aria-label="Описание сцены" required></textarea><div class="composer-footer"><span>Enter — отправить · Shift+Enter — новая строка</span><button id="send-button" class="send-button" type="submit" aria-label="Отправить">↑</button></div></form>
+        <div class="privacy-note">Запросы отправляются выбранной модели через сервер. Не вводите секретные данные.</div>
+      </aside>
     </section>
-    <aside class="chat">
-      <div class="chat-head"><b>Строитель ИИ</b><span id="model-name">openrouter/free</span></div>
-      <div id="messages" class="messages"><div class="assistant">Привет! Опиши объект, например: «современный низкополигональный дом у озера».</div></div>
-      <div id="live" class="live"><b>Живой процесс</b><div id="steps"></div></div>
-      <form id="prompt-form" class="prompt"><textarea id="prompt" placeholder="Опишите сцену…" required></textarea><button class="send" type="submit">↗</button></form>
-    </aside>
   </main>
   <script type="module" src="app.js"></script>
 </body>
